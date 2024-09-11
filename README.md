@@ -19,7 +19,8 @@ Create directory for your data and change owner
 ```
 chown -R 1000:1000 workspace
 ```
-Deploy Nextcloud using Docker Compose:
+Deploy Traefik and SiYuan using Docker Compose:
 ```
+docker compose -f 01-traefik-docker-compose.yaml -p siyuan up -d
 docker compose -f 02-siyuan-docker-compose.yaml -p siyuan up -d
 ```

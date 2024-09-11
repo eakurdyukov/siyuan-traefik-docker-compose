@@ -1,0 +1,32 @@
+networks:
+  siyuan-network:
+    external: true
+  traefik-network:
+    external: true
+services:
+  siyuan:
+    image: b3log/siyuan
+    command: ['--workspace=/siyuan/workspace/', '--accessAuthCode=${AuthCode}']
+    user: '1000:1000'
+    volumes:
+      - ./workspace:/siyuan/workspace
+    networks:
+      - siyuan-network
+      - traefik-network
+    environment:
+      # A list of time zone identifiers can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      - TZ=${TimeZone}
+      - AuthCode=${AuthCode}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.siyuan.entrypoints=websecure"
+      - "traefik.http.routers.siyuan.rule=Host(`${SIYUAN_HOSTNAME}`)"
+      - "traefik.http.routers.siyuan.service=siyuan"
+      - "traefik.http.services.siyuan.loadbalancer.server.port=6806"
+      - "traefik.http.routers.siyuan.tls=true"
+      - "traefik.http.routers.siyuan.tls.certresolver=letsencrypt"
+      - "traefik.http.services.siyuan.loadbalancer.passhostheader=true"
+      - "traefik.http.routers.siyuan.middlewares=compresstraefik"
+      - "traefik.http.middlewares.compresstraefik.compress=true"
+      - "traefik.docker.network=traefik-network"
+    restart: unless-stopped
